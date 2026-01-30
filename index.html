@@ -90,7 +90,7 @@ input {
 <body>
 
 <div class="container">
-  <h1>🔍 الاستعلام عن كود الطالب في مدرسة ادكو الثانويه بنين </h1>
+  <h1>🔍 الاستعلام عن كود الطالب لمدرسة إدكو الثانويه بنين </h1>
   <input id="search" placeholder="اكتب اسم الطالب">
   <div id="results"></div>
 </div>
@@ -108,6 +108,7 @@ const firebaseConfig = {
   messagingSenderId: "264407319824",
   appId: "1:264407319824:web:477d2fae113f7cd81bd195"
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
@@ -126,19 +127,27 @@ function normalize(text = "") {
 
 // تحميل البيانات مرة واحدة
 async function loadStudents() {
-  const snap = await get(ref(db, "students"));
-  if (!snap.exists()) return;
+  const results = document.getElementById("results");
+  results.innerHTML = '<div class="notfound">⏳ جاري تحميل البيانات...</div>';
+  try {
+    const snap = await get(ref(db, "students"));
+    results.innerHTML = ""; // مسح رسالة التحميل
+    if (!snap.exists()) return;
 
-  const data = snap.val();
-  for (let code in data) {
-    const meta = data[code].meta;
-    if (meta && meta["الاسم"]) {
-      students.push({
-        code,
-        name: meta["الاسم"],
-        grade: meta["الصف"] || "غير محدد"
-      });
+    const data = snap.val();
+    for (let code in data) {
+      const meta = data[code].meta;
+      if (meta && meta["الاسم"]) {
+        students.push({
+          code,
+          name: meta["الاسم"],
+          grade: meta["الصف"] || "غير محدد"
+        });
+      }
     }
+  } catch (e) {
+    results.innerHTML = '<div class="notfound">❌ حدث خطأ في التحميل. تأكد من الاتصال بالإنترنت.</div>';
+    console.error(e);
   }
 }
 loadStudents();
@@ -154,12 +163,12 @@ document.getElementById("search").addEventListener("input", e => {
 
     if (value.length < 3) return;
 
-    const match = students.find(s =>
+    const matches = students.filter(s =>
       normalize(s.name).includes(value)
     );
 
-    if (match) {
-      results.innerHTML = `
+    if (matches.length > 0) {
+      results.innerHTML = matches.map(match => `
         <div class="card">
           <h2>${match.name}</h2>
 
@@ -171,7 +180,7 @@ document.getElementById("search").addEventListener("input", e => {
             كود الطالب: ${match.code}
           </div>
         </div>
-      `;
+      `).join('');
     } else {
       results.innerHTML = `
         <div class="notfound">
