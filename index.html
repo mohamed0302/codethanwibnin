@@ -1,196 +1,262 @@
+<!-- c:\Users\Mohamed\Desktop\thanwia school\index.html -->
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الاستعلام عن كود الطالب</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+        }
 
-<title>الاستعلام عن كود الطالب</title>
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
 
-<style>
-:root {
-  --main: #1e88e5;
-  --bg: #f2f4f8;
-}
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            text-align: center;
+        }
 
-body {
-  margin: 0;
-  font-family: Tahoma, Arial, sans-serif;
-  background: var(--bg);
-}
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
 
-.container {
-  max-width: 600px;
-  margin: auto;
-  padding: 16px;
-}
+        p.subtitle {
+            color: var(--text-light);
+            margin-bottom: 30px;
+        }
 
-h1 {
-  text-align: center;
-  color: var(--main);
-  font-size: 24px;
-}
+        .search-box {
+            position: relative;
+            margin-bottom: 30px;
+        }
 
-input {
-  width: 100%;
-  padding: 14px;
-  font-size: 18px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  margin-top: 12px;
-}
+        input {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 1.1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-sizing: border-box;
+            text-align: center;
+        }
 
-.card {
-  background: #fff;
-  margin-top: 18px;
-  padding: 20px;
-  border-radius: 14px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-}
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
 
-.card h2 {
-  margin: 0 0 14px;
-  font-size: 22px;
-}
+        #loading {
+            display: none;
+            color: var(--text-light);
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
 
-.info {
-  font-size: 19px;
-  margin-bottom: 10px;
-}
+        .results {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
 
-.label {
-  color: #555;
-}
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+            text-align: right;
+            animation: fadeIn 0.3s ease-in-out;
+            transition: transform 0.2s;
+        }
 
-.code {
-  font-size: 28px;
-  font-weight: bold;
-  color: var(--main);
-  text-align: center;
-  margin-top: 16px;
-}
+        .card:hover {
+            transform: translateY(-2px);
+        }
 
-.notfound {
-  background: #fff3cd;
-  padding: 14px;
-  margin-top: 18px;
-  border-radius: 10px;
-  font-size: 18px;
-  text-align: center;
-}
+        .card h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.2rem;
+            color: var(--text);
+        }
 
-@media (max-width: 480px) {
-  h1 { font-size: 22px; }
-  .card h2 { font-size: 20px; }
-  .info { font-size: 18px; }
-  .code { font-size: 24px; }
-}
-</style>
+        .card .grade {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .code-badge {
+            background: #eff6ff;
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: inline-block;
+            border: 1px solid #dbeafe;
+            cursor: pointer;
+        }
+        
+        .code-badge:active {
+            background: #dbeafe;
+        }
+
+        .no-results {
+            background: #fff1f2;
+            color: #be123c;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #fecdd3;
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .footer {
+            margin-top: 50px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="container">
-  <h1>🔍 الاستعلام عن كود الطالب لمدرسة إدكو الثانويه بنين </h1>
-  <input id="search" placeholder="اكتب اسم الطالب">
-  <div id="results"></div>
-</div>
+    <div class="container">
+        <h1>🔍 الاستعلام عن كود الطالب</h1>
+        <p class="subtitle">مدرسة إدكو الثانوية بنين</p>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="اكتب اسم الطالب هنا..." autocomplete="off" disabled>
+            <div id="loading">جاري تحميل البيانات...</div>
+        </div>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBtRexl58EMIFgOF_IGaA_i9qn9kyw0hpQ",
-  authDomain: "thanwia-banin.firebaseapp.com",
-  databaseURL: "https://thanwia-banin-default-rtdb.firebaseio.com",
-  projectId: "thanwia-banin",
-  storageBucket: "thanwia-banin.firebasestorage.app",
-  messagingSenderId: "264407319824",
-  appId: "1:264407319824:web:477d2fae113f7cd81bd195"
-};
+        <div id="noResults" class="no-results">
+            لم يتم العثور على طالب بهذا الاسم.
+        </div>
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+        <div id="resultsContainer" class="results"></div>
 
-let students = [];
-let typingTimer;
+        <div class="footer">
+            تم التطوير بواسطة محمد إيهاب قاسم
+        </div>
+    </div>
 
-// تطبيع الاسم
-function normalize(text = "") {
-  return text
-    .toLowerCase()
-    .replace(/[أإآ]/g, "ا")
-    .replace(/ى/g, "ي")
-    .replace(/ة/g, "ه")
-    .replace(/\s+/g, "");
-}
+    <script>
+        let students = [];
+        const searchInput = document.getElementById('searchInput');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const noResults = document.getElementById('noResults');
+        const loading = document.getElementById('loading');
 
-// تحميل البيانات مرة واحدة
-async function loadStudents() {
-  const results = document.getElementById("results");
-  results.innerHTML = '<div class="notfound">⏳ جاري تحميل البيانات...</div>';
-  try {
-    const snap = await get(ref(db, "students"));
-    results.innerHTML = ""; // مسح رسالة التحميل
-    if (!snap.exists()) return;
+        // دالة تطبيع النصوص العربية (لتحسين البحث)
+        function normalizeText(text) {
+            if (!text) return "";
+            return text
+                .replace(/(آ|إ|أ)/g, 'ا')
+                .replace(/ة/g, 'ه')
+                .replace(/ى/g, 'ي')
+                .replace(/ؤ/g, 'و')
+                .replace(/ئ/g, 'ي')
+                .replace(/[^\u0600-\u06FF\s]/g, '') // إبقاء الحروف العربية والمسافات فقط
+                .replace(/\s+/g, ' ') // توحيد المسافات
+                .trim();
+        }
 
-    const data = snap.val();
-    for (let code in data) {
-      const meta = data[code].meta;
-      if (meta && meta["الاسم"]) {
-        students.push({
-          code,
-          name: meta["الاسم"],
-          grade: meta["الصف"] || "غير محدد"
+        // تحميل البيانات عند فتح الصفحة
+        async function loadData() {
+            loading.style.display = 'block';
+            try {
+                const response = await fetch('students.json');
+                if (!response.ok) throw new Error("فشل تحميل الملف");
+                students = await response.json();
+                
+                searchInput.disabled = false;
+                searchInput.placeholder = "اكتب اسم الطالب للبحث...";
+                searchInput.focus();
+            } catch (error) {
+                console.error(error);
+                searchInput.placeholder = "حدث خطأ في تحميل البيانات";
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // دالة البحث والعرض
+        function searchStudents(query) {
+            resultsContainer.innerHTML = '';
+            noResults.style.display = 'none';
+
+            const normalizedQuery = normalizeText(query);
+
+            if (normalizedQuery.length < 3) {
+                return; // لا تبحث إذا كان النص أقل من 3 حروف
+            }
+
+            // البحث في المصفوفة (n = الاسم)
+            const matches = students.filter(student => {
+                return normalizeText(student.n).includes(normalizedQuery);
+            });
+
+            if (matches.length === 0) {
+                noResults.style.display = 'block';
+                return;
+            }
+
+            // عرض النتائج (بحد أقصى 50 نتيجة لتجنب البطء)
+            matches.slice(0, 50).forEach(student => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <h2>${student.n}</h2>
+                    <span class="grade">${student.g}</span>
+                    <div class="code-badge" onclick="copyCode('${student.c}')">
+                        الكود: ${student.c} 📋
+                    </div>
+                `;
+                resultsContainer.appendChild(card);
+            });
+        }
+
+        // نسخ الكود عند الضغط عليه
+        window.copyCode = function(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                alert('تم نسخ الكود: ' + code);
+            });
+        }
+
+        // الاستماع للكتابة في مربع البحث (مع تأخير بسيط للأداء)
+        let debounceTimer;
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                searchStudents(e.target.value);
+            }, 300);
         });
-      }
-    }
-  } catch (e) {
-    results.innerHTML = '<div class="notfound">❌ حدث خطأ في التحميل. تأكد من الاتصال بالإنترنت.</div>';
-    console.error(e);
-  }
-}
-loadStudents();
 
-// البحث بدون تهنيج
-document.getElementById("search").addEventListener("input", e => {
-  clearTimeout(typingTimer);
-
-  typingTimer = setTimeout(() => {
-    const value = normalize(e.target.value);
-    const results = document.getElementById("results");
-    results.innerHTML = "";
-
-    if (value.length < 3) return;
-
-    const matches = students.filter(s =>
-      normalize(s.name).includes(value)
-    );
-
-    if (matches.length > 0) {
-      results.innerHTML = matches.map(match => `
-        <div class="card">
-          <h2>${match.name}</h2>
-
-          <div class="info">
-            <span class="label">الصف:</span> ${match.grade}
-          </div>
-
-          <div class="code">
-            كود الطالب: ${match.code}
-          </div>
-        </div>
-      `).join('');
-    } else {
-      results.innerHTML = `
-        <div class="notfound">
-          ❌ لم يتم العثور على الاسم
-        </div>
-      `;
-    }
-  }, 300);
-});
-</script>
-
+        // بدء التحميل
+        loadData();
+    </script>
 </body>
 </html>
